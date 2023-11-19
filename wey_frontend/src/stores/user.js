@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import  axios from 'axios'
+import axios from 'axios'
 
 export const useUserStore = defineStore({
     id: 'user',
@@ -16,25 +16,27 @@ export const useUserStore = defineStore({
     }),
 
     actions: {
-        initStore(){
-            console.log('initStore')
-            if (localStorage.getItem('user.access')){
-                console.log('user has access')
+        initStore() {
+            console.log('initStore', localStorage.getItem('user.access'))
+
+            if (localStorage.getItem('user.access')) {
+                console.log('User has access!')
+
                 this.user.access = localStorage.getItem('user.access')
                 this.user.refresh = localStorage.getItem('user.refresh')
                 this.user.id = localStorage.getItem('user.id')
-                this.name = localStorage.getItem('user.name')
-                this.email = localStorage.getItem('user.emial')
+                this.user.name = localStorage.getItem('user.name')
+                this.user.email = localStorage.getItem('user.email')
                 this.user.isAuthenticated = true
 
                 this.refreshToken()
 
-                console.log('Initialized user: ', this.user)
+                console.log('Initialized user:', this.user)
             }
         },
 
         setToken(data) {
-            console.log ('setToken', data)
+            console.log('setToken', data)
 
             this.user.access = data.access
             this.user.refresh = data.refresh
@@ -42,6 +44,8 @@ export const useUserStore = defineStore({
 
             localStorage.setItem('user.access', data.access)
             localStorage.setItem('user.refresh', data.refresh)
+
+            console.log('user.access: ', localStorage.getItem('user.access'))
         },
 
         removeToken() {
@@ -92,6 +96,5 @@ export const useUserStore = defineStore({
                     this.removeToken()
                 })
         },
-
     }
 })
