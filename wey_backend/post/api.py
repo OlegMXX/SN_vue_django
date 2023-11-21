@@ -12,8 +12,11 @@ from .serializers import PostSerializer
 
 @api_view(['GET'])
 def post_list(request):
-    posts = Post.objects.all()
+    user_ids = [request.user.id] # add request user
+    for user in request.user.friends.all(): # add request user's friends
+        user_ids.append(user.id)
 
+    posts = Post.objects.filter(created_by_id__in=list(user_ids))
     serializer = PostSerializer(posts, many=True)
 
     return JsonResponse(serializer.data, safe=False)
