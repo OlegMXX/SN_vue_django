@@ -4,7 +4,9 @@ import django
 import os
 import sys
 
+from datetime import timedelta
 from collections import Counter
+from django.utils import timezone
 
 sys.path.append(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..'))
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "wey_backend.settings")
@@ -40,7 +42,11 @@ def collect_hashtags(posts):
 for trend in Trend.objects.all():
     trend.delete()
 
-posts = Post.objects.all()
+# search only in last 24 hours trends
+this_hour = timezone.now().replace(minute=0, second=0, microsecond=0)
+one_day_before = this_hour - timedelta(hours=24)
+
+posts = Post.objects.filter(created_at__gte=one_day_before)
 trends = collect_hashtags(posts)
 
 trends_counter = Counter(trends).most_common(10)
