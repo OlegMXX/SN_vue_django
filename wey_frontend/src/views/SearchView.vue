@@ -22,7 +22,7 @@
                     v-for="user in users"
                     v-bind:key="user.id"
                 >
-                    <img src="https://i.pravatar.cc/300?img=02" class="mb-6 rounded-full">
+                    <img :src="user.get_avatar" class="mb-6 rounded-full">
                 
                     <p>
                         <strong>
