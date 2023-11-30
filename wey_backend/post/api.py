@@ -61,6 +61,10 @@ def post_create(request):
         post.created_by = request.user
         post.save()
 
+        user = request.user
+        user.posts_count += 1
+        user.save()
+
         serializer = PostSerializer(post)
 
         return JsonResponse(serializer.data, safe=False)
