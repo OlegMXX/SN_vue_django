@@ -40,9 +40,9 @@ def signup(request):
 
         # Send verification email later!
     else:
-        message = 'error'
+        message = form.errors.as_json()
 
-    return JsonResponse({'message': message})
+    return JsonResponse({'message': message}, safe=False)
 
 @api_view(['GET'])
 def friends(request, pk):
@@ -104,11 +104,12 @@ def editprofile(request):
     if User.objects.exclude(id=user.id).filter(email=email).exists():
         return JsonResponse({'message': 'email already exists'})
     else:
-        print(request.FILES)
         form = ProfileForm(request.POST, request.FILES, instance=user)
 
         if form.is_valid():
             form.save()
 
-        return JsonResponse({'message': 'information updated'})
+        serializer = UserSerializer(user)
+
+        return JsonResponse({'message': 'information updated', 'user': serializer.data})
 
