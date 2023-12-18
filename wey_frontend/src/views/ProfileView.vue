@@ -55,6 +55,11 @@
                         <form v-on:submit.prevent="submitForm" method="post">
                             <div class="p-4">  
                                 <textarea v-model="body" class="p-4 w-full bg-gray-100 rounded-lg" placeholder="What are you thinking about?"></textarea>
+
+                                <label>
+                                    <input type="checkbox" v-model="is_private"> Private
+                                </label>
+
                                 <div id="preview" v-if="url">
                                     <img :src="url" class="w-[100px] rounded-xl mt-3"/>
                                 </div>
@@ -131,6 +136,7 @@ export default {
             },
             can_send_friendship_request: null,
             body: '',
+            is_private: false,
             url: null,
         }
     }, 
@@ -211,6 +217,7 @@ export default {
             let formData = new FormData()
             formData.append('image', this.$refs.file.files[0])
             formData.append('body', this.body)
+            formData.append('is_private', this.is_private)
 
             axios
                 .post('/api/posts/create/', formData,{
@@ -223,6 +230,7 @@ export default {
 
                     this.posts.unshift(response.data)
                     this.body = ''
+                    this.is_private = false
                     this.$refs.file.value = null
                     this.url = null
                     this.user.posts_count += 1

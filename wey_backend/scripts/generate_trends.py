@@ -46,7 +46,7 @@ for trend in Trend.objects.all():
 this_hour = timezone.now().replace(minute=0, second=0, microsecond=0)
 one_day_before = this_hour - timedelta(hours=24)
 
-posts = Post.objects.filter(created_at__gte=one_day_before)
+posts = Post.objects.filter(created_at__gte=one_day_before).filter(is_private=False)
 trends = collect_hashtags(posts)
 
 trends_counter = Counter(trends).most_common(10)
