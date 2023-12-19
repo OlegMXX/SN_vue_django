@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.http import JsonResponse
 
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
@@ -22,7 +23,7 @@ def post_list(request):
     # for trend view
     trend = request.GET.get('trend', '')
     if trend:
-        posts = posts.filter(body__icontains='#'+trend)
+        posts = posts.filter(body__icontains='#'+trend).filter(is_private=False)
 
     serializer = PostSerializer(posts, many=True)
 
@@ -31,7 +32,12 @@ def post_list(request):
 
 @api_view(['GET'])
 def post_detail(request, pk):
-    post = Post.objects.get(pk=pk)
+    user_ids = [request.user.id]  # add request user
+
+    for user in request.user.friends.all():  # add request user's friends
+        user_ids.append(user.id)
+
+    post = Post.objects.filter(Q(created_by_id__in=list(user_ids)) | Q(is_private=False)).get(pk=pk)
 
     return JsonResponse({
         'post': PostDetailSerializer(post).data
@@ -40,9 +46,15 @@ def post_detail(request, pk):
 
 @api_view(['GET'])
 def post_list_profile(request, id):
+    """
+    Shows only user's posts at a user's page
+    Friends can see private posts
+    """
     user = User.objects.get(pk=id)
-
     posts = Post.objects.filter(created_by_id=id)
+
+    if not request.user in user.friends.all():
+        posts = posts.filter(is_private=False)
 
     post_serializer = PostSerializer(posts, many=True)
     user_serializer = UserSerializer(user)
